@@ -27,6 +27,33 @@ class Player(pygame.sprite.Sprite):
         #puntuacion
         self.score = 0
 
+        # Variables para el parpadeo cuando recibe daño
+        self.is_hit = False
+        self.hit_time = 0
+        self.blink_duration = 2000  # Duración del parpadeo en milisegundos (2 segundos)
+        self.blink_interval = 100  # Intervalo de parpadeo en milisegundos
+        self.visible = True
+
+    def take_damage(self):
+        """Marca al jugador como golpeado y comienza el parpadeo"""
+        self.is_hit = True
+        self.hit_time = pygame.time.get_ticks()
+        self.visible = True
+
+    def update_blink(self):
+        """Actualiza el estado de parpadeo del jugador"""
+        if self.is_hit:
+            current_time = pygame.time.get_ticks()
+            elapsed_time = current_time - self.hit_time
+
+            if elapsed_time < self.blink_duration:
+                # Alternar visibilidad basado en el intervalo de parpadeo
+                self.visible = (elapsed_time // self.blink_interval) % 2 == 0
+            else:
+                # Terminar el parpadeo
+                self.is_hit = False
+                self.visible = True
+
     def get_input(self):
         keys = pygame.key.get_pressed()
 
@@ -65,4 +92,5 @@ class Player(pygame.sprite.Sprite):
         self.get_input()
         self.constraint()
         self.recharge()
+        self.update_blink()  # Actualizar el estado de parpadeo
         self.lasers.update()

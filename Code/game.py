@@ -193,6 +193,9 @@ class Game:
                     laser.kill()
                     # vidas del jugador
                     self.lives -= 1
+                    # Reproducir sonido de explosión y activar parpadeo
+                    self.explosion_sound.play()
+                    self.player.sprite.take_damage()
                     if self.lives <= 0:
                         print('EL JUGADOR A MUERTO')
                         self.game_over_sound.play()
@@ -233,6 +236,9 @@ class Game:
             self.player.sprite.score = 0
             # Reposicionar la nave al centro inferior (usar ints)
             self.player.sprite.rect.midbottom = (int(self.screen_width / 2), int(self.screen_height))
+            # Resetear estado de parpadeo
+            self.player.sprite.is_hit = False
+            self.player.sprite.visible = True
         self.lives = 3  # Vidas iniciales
         self.game_over = False
         self.paused = False
@@ -258,7 +264,9 @@ class Game:
         self.collision_checks()
 
         self.player.sprite.lasers.draw(self.screen)
-        self.player.draw(self.screen)
+        # Dibujar la nave solo si es visible (para el efecto de parpadeo)
+        if self.player.sprite.visible:
+            self.player.draw(self.screen)
 
         self.blocks.draw(self.screen)
         self.aliens.draw(self.screen)
